@@ -17,7 +17,7 @@ final class DataCaller {
     
     private init() {}
     
-    public func getTopStories(comletion: @escaping (Result<[String], Error>) -> Void) {
+    public func getTopStories(comletion: @escaping (Result<[Article], Error>) -> Void) {
         guard let url = Constant.topHeadlinesURL else {
             return
         }
@@ -30,6 +30,7 @@ final class DataCaller {
                     let result = try JSONDecoder().decode(APIResponse.self, from: data)
                     
                     print("Articles \(result.articles.count)")
+                    comletion(.success(result.articles))
                 }
                 catch {
                     comletion(.failure(error))
@@ -39,3 +40,5 @@ final class DataCaller {
         task.resume()
     }
 }
+
+
