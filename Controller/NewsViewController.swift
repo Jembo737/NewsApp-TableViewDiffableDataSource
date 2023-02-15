@@ -7,48 +7,59 @@
 
 import UIKit
 import SafariServices
+
 class NewsViewController: UIViewController {
     
-    private var tableView: UITableView = {
-        let table = UITableView()
-        table.register(NewsTableViewCell.self, forCellReuseIdentifier: NewsTableViewCell.identifier)
-        
-        return table
-    }()
-    
+    private var tableView: UITableView!
     private var articles = [Article]()
-    private var viewModels = [NewsTableViewCellViewModel]()
+    private var dataSource: UITableViewDiffableDataSource<Int, NewsTableViewCellViewModel>!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.delegate = self
-        tableView.dataSource = self
-        view.addSubview(tableView)
+        setupTableView()
         title = "News"
         view.backgroundColor = .systemBackground
         
-        
         fetchTopStories()
     }
-    override func viewDidLayoutSubviews() {
-        tableView.frame = view.bounds
+    
+    private func setupTableView() {
+        tableView = UITableView(frame: view.bounds, style: .plain)
+        tableView.register(NewsTableViewCell.self, forCellReuseIdentifier: NewsTableViewCell.identifier)
+        tableView.delegate = self
+        view.addSubview(tableView)
+        
+        dataSource = UITableViewDiffableDataSource(tableView: tableView, cellProvider: { tableView, indexPath, viewModel in
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: NewsTableViewCell.identifier, for: indexPath) as? NewsTableViewCell else {
+                fatalError()
+            }
+            cell.configure(with: viewModel)
+            return cell
+        })
+    }
+}
+
+extension NewsViewController {
+    private func applySnapshot() {
+        var snapshot = NSDiffableDataSourceSnapshot<Int, NewsTableViewCellViewModel>()
+        snapshot.appendSections([0])
+        snapshot.appendItems(articles.map({
+            NewsTableViewCellViewModel(
+                title: $0.title,
+                author: $0.author ?? "No Author",
+                imageURL: URL(string: $0.urlToImage ?? "")
+            )
+        }))
+        dataSource.apply(snapshot, animatingDifferences: true)
     }
     
-    func fetchTopStories() {
+    private func fetchTopStories() {
         DataCaller.shared.getTopStories { [weak self] result in
             switch result {
             case .success(let articles):
                 self?.articles = articles
-                self?.viewModels = articles.compactMap({
-                    NewsTableViewCellViewModel(
-                        title: $0.title,
-                        author: $0.author ?? "No Author",
-                        imageURL: URL(string: $0.urlToImage ?? "")
-                    )
-                })
-                
                 DispatchQueue.main.async {
-                    self?.tableView.reloadData()
+                    self?.applySnapshot()
                 }
             case .failure(let error):
                 print(error)
@@ -57,19 +68,7 @@ class NewsViewController: UIViewController {
     }
 }
 
-extension NewsViewController: UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        viewModels.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: NewsTableViewCell.identifier, for: indexPath) as? NewsTableViewCell else {
-            fatalError()
-        }
-        cell.configure(with: viewModels[indexPath.row])
-        return cell
-    }
-    
+extension NewsViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let article = articles[indexPath.row]
@@ -80,7 +79,9 @@ extension NewsViewController: UITableViewDelegate, UITableViewDataSource {
         let safariVC = SFSafariViewController(url: url)
         present(safariVC, animated: true)
     }
+    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 150
     }
 }
+
