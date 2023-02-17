@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+//MARK: - Cell Model
 class NewsTableViewCellViewModel: HashableClass {
     let title: String
     let author: String
@@ -19,13 +19,12 @@ class NewsTableViewCellViewModel: HashableClass {
         self.imageURL = imageURL
     }
 }
-
-
+// Hasher class. To make NewsTableViewCellViewModel Hashable (generic requirement)
 open class HashableClass {
     public init() {}
 }
 
-// MARK: - <Hashable>
+// <Hashable>
 
 extension HashableClass: Hashable {
 
@@ -34,7 +33,7 @@ extension HashableClass: Hashable {
     }
 }
 
-// MARK: - <Equatable>
+// <Equatable>
 
 extension HashableClass: Equatable {
 

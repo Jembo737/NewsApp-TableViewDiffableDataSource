@@ -9,7 +9,7 @@ import UIKit
 import SafariServices
 
 class NewsViewController: UIViewController {
-    
+    //MARK: - Main data and UI holders
     private var tableView: UITableView!
     private var articles = [Article]()
     private var filteredArticles = [Article]()
@@ -26,11 +26,8 @@ class NewsViewController: UIViewController {
         fetchTopStories()
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        tableView.frame = view.bounds
-    }
     
+    //MARK: - TableView setup.
     private func setupTableView() {
         tableView = UITableView(frame: view.bounds, style: .plain)
         tableView.register(NewsTableViewCell.self, forCellReuseIdentifier: NewsTableViewCell.identifier)
@@ -50,6 +47,7 @@ class NewsViewController: UIViewController {
 }
 
 extension NewsViewController {
+    //MARK: - Fetch Manager and Snapshot initialization for using of DiffableDataSource.
     private func fetchTopStories() {
         DataCaller.shared.getTopStories { [weak self] result in
             switch result {
@@ -77,15 +75,8 @@ extension NewsViewController {
         }))
         dataSource.apply(snapshot, animatingDifferences: true)
     }
-    
-    private func setupSearchBar() {
-        navigationItem.searchController = searchController
-        searchController.obscuresBackgroundDuringPresentation = false
-        searchController.searchBar.delegate = self
-    }
-    
 }
-
+//MARK: - TableViewDelegate. (selecting and open safari link by tapping)
 extension NewsViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
@@ -102,7 +93,7 @@ extension NewsViewController: UITableViewDelegate {
         return 150
     }
 }
-
+//MARK: - Searchbar setup.
 extension NewsViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         filteredArticles = articles.filter { article in
@@ -114,6 +105,12 @@ extension NewsViewController: UISearchBarDelegate {
             return titleMatch || authorMatch
         }
         applySnapshot()
+    }
+    
+    private func setupSearchBar() {
+        navigationItem.searchController = searchController
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.delegate = self
     }
 }
 

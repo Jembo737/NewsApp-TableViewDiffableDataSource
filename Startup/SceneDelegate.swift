@@ -8,7 +8,7 @@
 import UIKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
-
+//MARK: - Creating a UIWindow with root NavigationCorntoller
     var window: UIWindow?
 
 
@@ -21,9 +21,5 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let navViewController = UINavigationController(rootViewController: viewController)
         window?.rootViewController = navViewController
     }
-
-    
-
-
 }
 

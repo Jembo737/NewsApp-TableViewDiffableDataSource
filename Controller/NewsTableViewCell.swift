@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+//MARK: - TableViewCell
 class NewsTableViewCell: UITableViewCell {
     static let identifier = "NewsTableViewCell"
     

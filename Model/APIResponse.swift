@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+//MARK: - JSON struct
 struct APIResponse: Codable {
     let articles: [Article]
 }

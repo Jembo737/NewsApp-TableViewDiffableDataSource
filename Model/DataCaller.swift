@@ -16,7 +16,7 @@ final class DataCaller {
     }
     
     private init() {}
-    
+    //MARK: - Getter of data
     public func getTopStories(comletion: @escaping (Result<[Article], Error>) -> Void) {
         guard let url = Constant.topHeadlinesURL else {
             return

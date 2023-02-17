@@ -1,2 +1,0 @@
-# NewsApp-TableViewDiffableDataSource
- News application created with UITableViewDiffableDataSource
