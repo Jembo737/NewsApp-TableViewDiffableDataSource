@@ -105,12 +105,15 @@ extension NewsViewController: UITableViewDelegate {
 
 extension NewsViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        filteredArticles = articles.filter({ article in
+        filteredArticles = articles.filter { article in
             if searchText.isEmpty {
                 return true
             }
-            return article.title.lowercased().contains(searchText.lowercased())
-        })
+            let titleMatch = article.title.lowercased().contains(searchText.lowercased())
+            let authorMatch = (article.author ?? "").lowercased().contains(searchText.lowercased())
+            return titleMatch || authorMatch
+        }
         applySnapshot()
     }
 }
+
